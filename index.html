@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini GitHub Clone</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h1>Mini GitHub Clone</h1>
+
+  <!-- REGISTER -->
+  <div class="card">
+    <h2>Register</h2>
+    <input id="username" placeholder="Username">
+    <button onclick="register()">Register</button>
+  </div>
+
+  <!-- CREATE REPO -->
+  <div class="card">
+    <h2>Create Repo</h2>
+    <input id="repoUser" placeholder="Username">
+    <input id="repoName" placeholder="Repo Name">
+    <button onclick="createRepo()">Create</button>
+  </div>
+
+  <!-- LIST REPOS -->
+  <div class="card">
+    <h2>View Repos</h2>
+    <input id="viewUser" placeholder="Username">
+    <button onclick="getRepos()">Load</button>
+    <ul id="repoList"></ul>
+  </div>
+
+  <!-- ADD FILE -->
+  <div class="card">
+    <h2>Add File + Commit</h2>
+    <input id="fileUser" placeholder="Username">
+    <input id="fileRepo" placeholder="Repo">
+    <input id="filename" placeholder="Filename">
+    <textarea id="content" placeholder="File content"></textarea>
+    <button onclick="addFile()">Add</button>
+  </div>
+
+<script>
+const API = "http://localhost:3000";
+
+// register
+async function register() {
+  const username = document.getElementById("username").value;
+
+  const res = await fetch(API + "/register", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ username })
+  });
+
+  alert(await res.text());
+}
+
+// create repo
+async function createRepo() {
+  const username = document.getElementById("repoUser").value;
+  const repoName = document.getElementById("repoName").value;
+
+  const res = await fetch(API + "/repo", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ username, repoName })
+  });
+
+  alert(await res.text());
+}
+
+// list repos
+async function getRepos() {
+  const username = document.getElementById("viewUser").value;
+
+  const res = await fetch(API + "/repos/" + username);
+  const data = await res.json();
+
+  const list = document.getElementById("repoList");
+  list.innerHTML = "";
+
+  data.forEach(r => {
+    const li = document.createElement("li");
+    li.innerText = r.repoName;
+    list.appendChild(li);
+  });
+}
+
+// add file
+async function addFile() {
+  const username = document.getElementById("fileUser").value;
+  const repo = document.getElementById("fileRepo").value;
+  const filename = document.getElementById("filename").value;
+  const content = document.getElementById("content").value;
+
+  const res = await fetch(`${API}/repo/${username}/${repo}/add`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ filename, content })
+  });
+
+  alert(await res.text());
+}
+</script>
+
+</body>
+</html>
